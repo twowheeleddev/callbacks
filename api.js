@@ -1,18 +1,20 @@
-// Classic Node-style API
-function fetchDataCallback(url, callback) {
-  setTimeout(() => {
-    if (!url.startsWith("https")) {
-      return callback(new Error(`Invalid URL: ${url}`));
-    }
-    callback(null, { data: `Payload froom ${url}` });
-  }, 1000);
+function fetchDataPromise(url) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (!url.startWith("http")) {
+        return reject(new Error("Invalid URL"));
+      }
+      resolve({ data: `Payload from ${url}` });
+    }, 1000);
+  });
 }
 
 // Usage
-fetchDataCallback("http://api.example.com", (err, result) => {
-  if (err) {
-    console.error("Fetch failed:", err);
-    return;
-  }
-  console.log("Received Successfully:", result.data);
-});
+fetchDataPromise("http://api.example.com")
+  .then((result) => {
+    console.log("Received Successfully:", result.data);
+    return fetchDataPromise("/bad-url");
+  })
+  .catch((err) => {
+    console.error("Error Occurred:", err);
+  });
